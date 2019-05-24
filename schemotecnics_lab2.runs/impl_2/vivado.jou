@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Vivado v2018.3 (64-bit)
+# SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+# IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+# Start of session at: Thu May 16 15:09:05 2019
+# Process ID: 20292
+# Current directory: D:/Projects/Vviado/schemotecnics_lab2/schemotecnics_lab2.runs/impl_2
+# Command line: vivado.exe -log calc_func.vdi -applog -product Vivado -messageDb vivado.pb -mode batch -source calc_func.tcl -notrace
+# Log file: D:/Projects/Vviado/schemotecnics_lab2/schemotecnics_lab2.runs/impl_2/calc_func.vdi
+# Journal file: D:/Projects/Vviado/schemotecnics_lab2/schemotecnics_lab2.runs/impl_2\vivado.jou
+#-----------------------------------------------------------
+source calc_func.tcl -notrace

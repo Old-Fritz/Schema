@@ -1,0 +1,9 @@
+0.6
+2018.3
+Dec  6 2018
+23:39:36
+/home/pihanya/Development/Xilinx/schemotecnics_lab2/schemotecnics_lab2.sim/sim_1/behav/xsim/glbl.v,1544155481,verilog,,,,glbl,,,,,,,,
+/home/pihanya/Development/Xilinx/schemotecnics_lab2/schemotecnics_lab2.srcs/sim_1/new/func_test.v,1555661081,verilog,,,,func_test,,,,,,,,
+/home/pihanya/Development/Xilinx/schemotecnics_lab2/schemotecnics_lab2.srcs/sim_1/new/mult_test.v,1555623158,verilog,,,,mult_test,,,,,,,,
+/home/pihanya/Development/Xilinx/schemotecnics_lab2/schemotecnics_lab2.srcs/sources_1/new/calc_func.v,1555658122,verilog,,/home/pihanya/Development/Xilinx/schemotecnics_lab2/schemotecnics_lab2.srcs/sources_1/new/mult.v,,calc_func,,,,,,,,
+/home/pihanya/Development/Xilinx/schemotecnics_lab2/schemotecnics_lab2.srcs/sources_1/new/mult.v,1555622621,verilog,,/home/pihanya/Development/Xilinx/schemotecnics_lab2/schemotecnics_lab2.srcs/sim_1/new/func_test.v,,mult,,,,,,,,
