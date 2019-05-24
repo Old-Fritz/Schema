@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module LFSR(
+module lfsr(
     input gen_i,
     input rst_i,
     
