@@ -9,7 +9,7 @@ module control(
     input mode_switch_i,
     
     output reg [7:0] y_bo,
-    output reg [7:0] switch_count
+    output reg [7:0] switch_count_bo
     );
     
     wire func_busy;
@@ -23,9 +23,10 @@ module control(
     wire test_mode;
     wire step_signal;
     wire calc_busy;
+    wire[7:0] bist_switch_count;
     bist bist_module(
-        .clk_i(clk_i), .rst_i(rst_i), .function_busy(calc_busy), .mode_switch(mode_switch_i),
-        .test_mode_o(test_mode), .step_signal(step_signal), .switch_count(switch_count)
+        .clk_i(clk_i), .rst_i(rst_i), .function_busy_i(calc_busy), .mode_switch_i(mode_switch_i),
+        .test_mode_o(test_mode), .step_signal_o(step_signal), .switch_count_o(bist_switch_count)
     );
     
     wire[7:0] lfsr_output;
@@ -60,5 +61,7 @@ module control(
             crc_start <= 1;
             crc_flag <= 0;
         end
+        if(test_mode)
+            switch_count_bo <= bist_switch_count;
     end
 endmodule
