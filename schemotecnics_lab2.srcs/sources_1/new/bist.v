@@ -6,23 +6,27 @@ module bist(
     input function_busy_i, 
     input mode_switch_i, 
     
-    output reg [0:0] test_mode_o,
-    output reg [7:0] switch_count_o,
-    output reg step_signal_o
+    output reg test_mode_o = 0,
+    output reg step_signal_o = 0,
+    output reg [7:0] switch_count_o
 );
 
     localparam TESTS_AMOUNT = 8'd255;
     
+    
     integer test_index = 0;
-      
+    reg button_pressed = 0;  
         
-    always@(posedge clk_i, negedge mode_switch_i)
+    always@(posedge clk_i)
         if(rst_i) begin
             test_mode_o <= 0;
             test_index <= 0;
             switch_count_o <= 0;
             //step_signal_o <= 0;
-        end else if(mode_switch_i) begin
+        end else if(mode_switch_i & !button_pressed) begin
+            button_pressed <=1;
+        end else if(!mode_switch_i & button_pressed) begin
+            button_pressed <= 0;
             if(!test_mode_o) begin
                 test_mode_o <= 1;
                 switch_count_o <= switch_count_o + 1;

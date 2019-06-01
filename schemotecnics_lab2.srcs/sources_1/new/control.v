@@ -12,6 +12,9 @@ module control(
     output reg [7:0] switch_count_bo
     );
     
+    
+    
+    
     wire func_busy;
     reg func_start = 0;
     wire[7:0] func_input;
@@ -20,9 +23,9 @@ module control(
         .clk_i(clk_i), .rst_i(rst_i), .x_bi(func_input), .start_i(func_start), .busy_o(func_busy), .y_bo(func_output)
     );
     
+    reg calc_busy = 0;
     wire test_mode;
     wire step_signal;
-    reg calc_busy = 0;
     wire[7:0] bist_switch_count;
     bist bist_module(
         .clk_i(clk_i), .rst_i(rst_i), .function_busy_i(calc_busy), .mode_switch_i(mode_switch_i),
@@ -31,7 +34,7 @@ module control(
     
     wire[7:0] lfsr_output;
     lfsr lfsr_module(
-        .gen_i(step_signal), .rst_i(rst_i), .y_bo(lfsr_output)
+        .clk_i(clk_i), .rst_i(rst_i), .step_signal(step_signal), .y_bo(lfsr_output)
     );
     
     wire[7:0] crc_output;
@@ -40,20 +43,20 @@ module control(
     reg crc_flag = 0;
     wire crc_rst;
     crc8 crc_module(
-        .clk_i(clk_i), .rst_i(crc_rst), .y_val(func_output), .crc_o(crc_output), .start_i(crc_start), .busy_o(crc_busy)
+        .clk_i(clk_i), .rst_i(crc_rst), .start_i(crc_start), .y_val(func_output), .busy_o(crc_busy), .crc_o(crc_output)
     );
     
     assign func_input = test_mode ? lfsr_output : x_bi;
     assign crc_rst = rst_i | mode_switch_i;
     
-    always@(posedge clk_i, posedge rst_i)
+    always@(posedge clk_i)
         if(rst_i) begin
             calc_busy <= 0;
             crc_start <= 0;
             crc_flag <= 0;
             func_start <= 0;
         end else begin
-            y_bo = test_mode ? crc_output : func_output;
+            
             calc_busy <= func_busy | crc_busy | func_start | crc_start;
             if(func_start)
                 func_start <= 0;
@@ -71,7 +74,13 @@ module control(
                 crc_flag <= 0;
                 calc_busy <= 1;
             end
-            if(test_mode)
-                switch_count_bo = bist_switch_count;
+            if(test_mode) begin
+                switch_count_bo <= bist_switch_count;
+                y_bo <= crc_output;
+            end else begin
+                switch_count_bo <= 0;
+                y_bo <= func_output;
+            end
+                
         end
 endmodule
