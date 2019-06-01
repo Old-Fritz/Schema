@@ -13,7 +13,7 @@ module control(
     );
     
     wire func_busy;
-    reg func_start;
+    reg func_start = 0;
     wire[7:0] func_input;
     wire[7:0] func_output;
     calc_func func_module(
@@ -22,7 +22,7 @@ module control(
     
     wire test_mode;
     wire step_signal;
-    wire calc_busy;
+    reg calc_busy = 0;
     wire[7:0] bist_switch_count;
     bist bist_module(
         .clk_i(clk_i), .rst_i(rst_i), .function_busy_i(calc_busy), .mode_switch_i(mode_switch_i),
@@ -36,32 +36,42 @@ module control(
     
     wire[7:0] crc_output;
     wire crc_busy;
-    reg crc_start;
-    reg crc_flag;
+    reg crc_start = 0;
+    reg crc_flag = 0;
+    wire crc_rst;
     crc8 crc_module(
-        .clk_i(clk_i), .rst_i(rst_i), .y_val(func_output), .crc_o(crc_output), .start_i(crc_start), .busy_o(crc_busy)
+        .clk_i(clk_i), .rst_i(crc_rst), .y_val(func_output), .crc_o(crc_output), .start_i(crc_start), .busy_o(crc_busy)
     );
     
     assign func_input = test_mode ? lfsr_output : x_bi;
-    assign calc_busy = func_busy | crc_busy;
+    assign crc_rst = rst_i | mode_switch_i;
     
-    always@(posedge clk_i) begin
-        y_bo <= test_mode ? crc_output : func_output;
-        if(func_start)
-            func_start <= 0;
-        if(crc_start)
+    always@(posedge clk_i, posedge rst_i)
+        if(rst_i) begin
+            calc_busy <= 0;
             crc_start <= 0;
-        if(step_signal) begin
-            crc_flag <= 1;
-            func_start <= 1;
-        end
-        if(!test_mode & start_i)
-            func_start <= 1;
-        if(crc_flag & !func_start & !func_busy) begin
-            crc_start <= 1;
             crc_flag <= 0;
+            func_start <= 0;
+        end else begin
+            y_bo = test_mode ? crc_output : func_output;
+            calc_busy <= func_busy | crc_busy | func_start | crc_start;
+            if(func_start)
+                func_start <= 0;
+            if(crc_start)
+                crc_start <= 0;
+            if(step_signal) begin
+                crc_flag <= 1;
+                func_start <= 1;
+                calc_busy <=1;
+            end
+            if(!test_mode & start_i)
+                func_start <= 1;
+            if(crc_flag & !func_start & !func_busy) begin
+                crc_start <= 1;
+                crc_flag <= 0;
+                calc_busy <= 1;
+            end
+            if(test_mode)
+                switch_count_bo = bist_switch_count;
         end
-        if(test_mode)
-            switch_count_bo <= bist_switch_count;
-    end
 endmodule

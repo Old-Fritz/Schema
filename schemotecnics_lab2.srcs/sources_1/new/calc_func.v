@@ -101,6 +101,8 @@ module calc_func (
                         phase_start <= 0;
                     end else if (end_calc) begin
                         // x^5/120
+                        //mult1_a <= mult1_b;
+                        //mult1_b <= mult1_a;
                         mult1_a <= mult1_res;
                         mult1_b <= mult2_res;
                         mult1_ror <= 7;
