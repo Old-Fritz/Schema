@@ -76,7 +76,8 @@ module control(
             end
             if(test_mode) begin
                 switch_count_bo <= bist_switch_count;
-                y_bo <= crc_output;
+                if(!mode_switch_i) // If mode switch button is not pushed
+                    y_bo <= crc_output;
             end else begin
                 switch_count_bo <= 0;
                 y_bo <= func_output;
