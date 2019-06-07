@@ -23,13 +23,17 @@ module control_test;
         
     integer i = 15000;
         initial begin
+        
+        // start
             rst = 1;
             clk = 0;
             start = 0;
             #5 clk = 1;
             
             #5 rst = 0;
-            mode = 1'b1;
+            
+            // go to test mode
+            mode = 1;
             clk = 0;
             #5 clk = 1;
             #5 clk = 0;
@@ -37,7 +41,21 @@ module control_test;
             mode = 0;
             #5 clk = 1;
             #5 clk = 0;
+            #5 clk = 1;
+            #5 clk = 0;
+            #5 clk = 1;
+            #5 clk = 0;
+            #1000
             
+            // start tests
+            start = 1;
+            
+            #5 clk = 1;
+            #5 clk = 0;
+            
+            start = 0;
+            
+            // calc tests
             while(i>0) begin
                 clk = 1;
                 #5
@@ -48,6 +66,7 @@ module control_test;
                 i = i-1;
             end
             
+            // go to calc mode
             mode = 1;
             #1000
             #5 clk = 1;
@@ -57,6 +76,7 @@ module control_test;
             #5 clk = 1;
             #5 clk = 0;
             
+            // set x and start func
             i = 1000;
             x = 8'b01010000;
             start = 1;
@@ -66,6 +86,7 @@ module control_test;
             
             start = 0;
             
+            // calc func
             while(i>0) begin
                 clk = 1;
                 #5
@@ -76,6 +97,7 @@ module control_test;
                 i = i-1;
             end
             
+            // go to test mode
             mode = 1;
             #1000
             #5 clk = 1;
@@ -84,7 +106,20 @@ module control_test;
             mode = 0;
             #5 clk = 1;
             #5 clk = 0;
+            #5 clk = 1;
+            #5 clk = 0;
+            #5 clk = 1;
+            #5 clk = 0;
+            #1000
+            // start tests
+            start = 1;
             
+            #5 clk = 1;
+            #5 clk = 0;
+            
+            start = 0;
+            
+            //calc tests
             i = 15000;
             while(i>0) begin
                 clk = 1;

@@ -28,7 +28,7 @@ module control(
     wire step_signal;
     wire[7:0] bist_switch_count;
     bist bist_module(
-        .clk_i(clk_i), .rst_i(rst_i), .function_busy_i(calc_busy), .mode_switch_i(mode_switch_i),
+        .clk_i(clk_i), .rst_i(rst_i), .start_i(start_i), .function_busy_i(calc_busy), .mode_switch_i(mode_switch_i),
         .test_mode_o(test_mode), .step_signal_o(step_signal), .switch_count_o(bist_switch_count)
     );
     
@@ -48,8 +48,8 @@ module control(
     );
     
     assign func_input = test_mode ? lfsr_output : x_bi;
-    assign crc_rst = rst_i | mode_switch_i;
-    assign lsfr_rst = rst_i | mode_switch_i;
+    assign crc_rst = rst_i | mode_switch_i | (test_mode & start_i);
+    assign lsfr_rst = crc_rst;
     
     always@(posedge clk_i)
         if(rst_i) begin

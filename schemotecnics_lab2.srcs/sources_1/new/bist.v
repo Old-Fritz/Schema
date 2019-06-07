@@ -3,6 +3,7 @@
 module bist(
     input clk_i, 
     input rst_i, 
+    input start_i,
     input function_busy_i, 
     input mode_switch_i, 
     
@@ -16,6 +17,7 @@ module bist(
     
     integer test_index = 0;
     reg button_pressed = 0;  
+    reg started = 0;
         
     always@(posedge clk_i) begin
         if(rst_i) begin // Pushed reset button
@@ -29,25 +31,32 @@ module bist(
             button_pressed <= 0;
             if(!test_mode_o) begin
                 test_mode_o <= 1;
+                started <= 0;
                 switch_count_o <= switch_count_o + 1;
             end else begin // If want to switch from test mode then need to reset test_index
                 step_signal_o <= 0;
-                test_index <= 0;
                 test_mode_o <= 0;
             end    
-        end
-        if(test_mode_o) begin
-            if(!function_busy_i) begin // If function block is free
-                if(test_index >= TESTS_AMOUNT) begin
-                    step_signal_o <= 0;
-                end else begin
-                    step_signal_o <= 1;
-                    test_index <= test_index + 1;
-                end
-            end else begin
+        end else if(test_mode_o) begin
+            if(start_i) begin // start tests
                 step_signal_o <= 0;
-            end
-        end
-    end
- 
+                test_index <= 0;
+                started <= 1;
+            end else if(started)
+                if(!function_busy_i) begin // If function block is free
+                    if(step_signal_o)
+                        step_signal_o <= 0;
+                    if(test_index >= TESTS_AMOUNT) begin
+                        step_signal_o <= 0;
+                        started <= 0;
+                    end else begin
+                        step_signal_o <= 1;
+                        test_index <= test_index + 1;
+                    end
+                end else begin
+                    step_signal_o <= 0;
+                end
+            end else
+                step_signal_o <= 0;
+        end 
 endmodule
