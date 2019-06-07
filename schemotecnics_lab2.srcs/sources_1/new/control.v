@@ -57,32 +57,33 @@ module control(
             crc_start <= 0;
             crc_flag <= 0;
             func_start <= 0;
-        end else begin
-            calc_busy <= func_busy | crc_busy | func_start | crc_start;
-            if(func_start)
+         end else if(mode_switch_i) begin // on change mode button press
+            y_bo <=0;
+            switch_count_bo <= 0;
+         end else if(test_mode) begin // on test mode
+            y_bo <= crc_output;
+            switch_count_bo <= bist_switch_count;
+            calc_busy <= func_busy | crc_busy | func_start | crc_start; // test busy from start signal to crc calcs
+            if(func_start) // reset start
                 func_start <= 0;
-            if(crc_start)
+            if(crc_start)  // reset start
                 crc_start <= 0;
-            if(step_signal) begin
+            if(step_signal) begin // start calculations on next signal from bist
                 crc_flag <= 1;
                 func_start <= 1;
                 calc_busy <=1;
             end
-            if(!test_mode & start_i)
-                func_start <= 1;
-            if(crc_flag & !func_start & !func_busy) begin
+            if(crc_flag & !func_start & !func_busy) begin // start crc calculations after func finished
                 crc_start <= 1;
                 crc_flag <= 0;
                 calc_busy <= 1;
             end
-            if(test_mode) begin
-                switch_count_bo <= bist_switch_count;
-                if(!mode_switch_i) // If mode switch button is not pushed
-                    y_bo <= crc_output;
-            end else begin
-                switch_count_bo <= 0;
-                y_bo <= func_output;
-            end
-                
-        end
+         end else begin // on calc mode
+            y_bo <= func_output;
+            switch_count_bo <= 0;
+            if(func_start) // reset start
+                func_start <= 0;
+            if(start_i) // get signal from button
+                func_start <= 1;
+         end
 endmodule
