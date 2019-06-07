@@ -36,7 +36,6 @@ module bist(
                 test_mode_o <= 0;
             end    
         end
-        
         if(test_mode_o) begin
             if(!function_busy_i) begin // If function block is free
                 if(test_index >= TESTS_AMOUNT) begin

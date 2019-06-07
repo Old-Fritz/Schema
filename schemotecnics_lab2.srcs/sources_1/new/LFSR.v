@@ -14,7 +14,7 @@ module lfsr(
     
     always@(posedge clk_i, posedge rst_i)
         if(rst_i) begin
-           y_bo <= ONE;
+           y_bo <= 0;
         end else if (step_signal) begin
             if(y_bo & ONE) begin
                 y_bo <= (y_bo ^ POLY)>>1 | 8'b10000000;

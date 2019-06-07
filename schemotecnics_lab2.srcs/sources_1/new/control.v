@@ -33,8 +33,9 @@ module control(
     );
     
     wire[7:0] lfsr_output;
+    wire lsfr_rst;
     lfsr lfsr_module(
-        .clk_i(clk_i), .rst_i(rst_i), .step_signal(step_signal), .y_bo(lfsr_output)
+        .clk_i(clk_i), .rst_i(lsfr_rst), .step_signal(step_signal), .y_bo(lfsr_output)
     );
     
     wire[7:0] crc_output;
@@ -48,6 +49,7 @@ module control(
     
     assign func_input = test_mode ? lfsr_output : x_bi;
     assign crc_rst = rst_i | mode_switch_i;
+    assign lsfr_rst = rst_i | mode_switch_i;
     
     always@(posedge clk_i)
         if(rst_i) begin
@@ -56,7 +58,6 @@ module control(
             crc_flag <= 0;
             func_start <= 0;
         end else begin
-            
             calc_busy <= func_busy | crc_busy | func_start | crc_start;
             if(func_start)
                 func_start <= 0;
