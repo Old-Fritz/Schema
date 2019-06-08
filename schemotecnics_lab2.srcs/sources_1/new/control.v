@@ -26,10 +26,11 @@ module control(
     reg calc_busy = 0;
     wire test_mode;
     wire step_signal;
+    wire tests_ended;
     wire[7:0] bist_switch_count;
     bist bist_module(
         .clk_i(clk_i), .rst_i(rst_i), .start_i(start_i), .function_busy_i(calc_busy), .mode_switch_i(mode_switch_i),
-        .test_mode_o(test_mode), .step_signal_o(step_signal), .switch_count_o(bist_switch_count)
+        .test_mode_o(test_mode), .step_signal_o(step_signal), .switch_count_o(bist_switch_count), .tests_ended_o(tests_ended)
     );
     
     wire[7:0] lfsr_output;
@@ -46,7 +47,7 @@ module control(
     crc8 crc_module(
         .clk_i(clk_i), .rst_i(crc_rst), .start_i(crc_start), .y_val(func_output), .busy_o(crc_busy), .crc_o(crc_output)
     );
-    
+        
     assign func_input = test_mode ? lfsr_output : x_bi;
     assign crc_rst = rst_i | mode_switch_i | (test_mode & start_i);
     assign lsfr_rst = crc_rst;
@@ -61,7 +62,10 @@ module control(
             y_bo <=0;
             switch_count_bo <= 0;
          end else if(test_mode) begin // on test mode
-            y_bo <= crc_output;
+            if(tests_ended)
+                y_bo <= crc_output;
+            else
+                y_bo <= 0;
             switch_count_bo <= bist_switch_count;
             calc_busy <= func_busy | crc_busy | func_start | crc_start; // test busy from start signal to crc calcs
             if(func_start) // reset start

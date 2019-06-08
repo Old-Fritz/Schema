@@ -5,8 +5,9 @@ module bist(
     input rst_i, 
     input start_i,
     input function_busy_i, 
-    input mode_switch_i, 
+    input mode_switch_i,
     
+    output reg tests_ended_o = 0,
     output reg test_mode_o = 0,
     output reg step_signal_o = 0,
     output reg [7:0] switch_count_o
@@ -32,6 +33,7 @@ module bist(
             if(!test_mode_o) begin
                 test_mode_o <= 1;
                 started <= 0;
+                tests_ended_o <= 0;
                 switch_count_o <= switch_count_o + 1;
             end else begin // If want to switch from test mode then need to reset test_index
                 step_signal_o <= 0;
@@ -42,13 +44,15 @@ module bist(
                 step_signal_o <= 0;
                 test_index <= 0;
                 started <= 1;
+                tests_ended_o <= 0;
             end else if(started)
                 if(!function_busy_i) begin // If function block is free
                     if(step_signal_o)
                         step_signal_o <= 0;
-                    if(test_index >= TESTS_AMOUNT) begin
+                    if(test_index >= TESTS_AMOUNT) begin // end test calculations
                         step_signal_o <= 0;
                         started <= 0;
+                        tests_ended_o <= 1;
                     end else begin
                         step_signal_o <= 1;
                         test_index <= test_index + 1;
