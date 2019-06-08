@@ -13,8 +13,6 @@ module control(
     );
     
     
-    
-    
     wire func_busy;
     reg func_start = 0;
     wire[7:0] func_input;
@@ -27,9 +25,10 @@ module control(
     wire test_mode;
     wire step_signal;
     wire tests_ended;
+    reg bist_start = 0;
     wire[7:0] bist_switch_count;
     bist bist_module(
-        .clk_i(clk_i), .rst_i(rst_i), .start_i(start_i), .function_busy_i(calc_busy), .mode_switch_i(mode_switch_i),
+        .clk_i(clk_i), .rst_i(rst_i), .start_i(bist_start), .function_busy_i(calc_busy), .mode_switch_i(mode_switch_i),
         .test_mode_o(test_mode), .step_signal_o(step_signal), .switch_count_o(bist_switch_count), .tests_ended_o(tests_ended)
     );
     
@@ -58,10 +57,14 @@ module control(
             crc_start <= 0;
             crc_flag <= 0;
             func_start <= 0;
+            bist_start <= 0;
          end else if(mode_switch_i) begin // on change mode button press
             y_bo <=0;
             switch_count_bo <= 0;
+            bist_start <= 1;
          end else if(test_mode) begin // on test mode
+            if(bist_start)
+                bist_start <= 0;
             if(tests_ended)
                 y_bo <= crc_output;
             else

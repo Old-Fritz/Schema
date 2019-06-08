@@ -14,11 +14,12 @@ module bist(
 );
 
     localparam TESTS_AMOUNT = 8'd255;
-    
+    localparam MAX_TACTS = 8'd10;
     
     integer test_index = 0;
     reg button_pressed = 0;  
     reg started = 0;
+    reg[7:0] dreb_tacts = MAX_TACTS;
         
     always@(posedge clk_i) begin
         if(rst_i) begin // Pushed reset button
@@ -27,18 +28,24 @@ module bist(
             switch_count_o <= 0;
             //step_signal_o <= 0;
         end else if(mode_switch_i & !button_pressed) begin // Pushed mode switch button
+            dreb_tacts = MAX_TACTS;
             button_pressed <=1;
+        end else if (mode_switch_i  & button_pressed) begin
+            if(dreb_tacts > 0)
+                dreb_tacts = dreb_tacts - 1;
         end else if(!mode_switch_i & button_pressed) begin // Triggered mode switch (release button)
-            button_pressed <= 0;
-            if(!test_mode_o) begin
-                test_mode_o <= 1;
-                started <= 0;
-                tests_ended_o <= 0;
-                switch_count_o <= switch_count_o + 1;
-            end else begin // If want to switch from test mode then need to reset test_index
-                step_signal_o <= 0;
-                test_mode_o <= 0;
-            end    
+            if(dreb_tacts == 0) begin
+                button_pressed <= 0;
+                if(!test_mode_o) begin
+                    test_mode_o <= 1;
+                    started <= 0;
+                    tests_ended_o <= 0;
+                    switch_count_o <= switch_count_o + 1;
+                end else begin // If want to switch from test mode then need to reset test_index
+                    step_signal_o <= 0;
+                    test_mode_o <= 0;
+                end    
+            end
         end else if(test_mode_o) begin
             if(start_i) begin // start tests
                 step_signal_o <= 0;
